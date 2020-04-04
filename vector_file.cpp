@@ -1,31 +1,108 @@
 #include <iostream>
 #include <string>
+#include <vector>
+#include <algorithm>
+#define __CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#define new DEBUG_NEW
 
 const int FIXED_CAP = 8;
+
+template <class T>
+class Iterator {
+private:
+    T* it;
+public:
+    Iterator(T* arr) {
+        it = arr;
+    }
+    void operator+= (int n) {
+        it += n;
+    }
+    void operator-= (int n) {
+        it -= n;
+    }
+    Iterator operator+ (int n) const {
+        return it + n;
+    }
+    Iterator operator- (int n) const {
+        return it - n;
+    }
+    void operator-- () {
+        it--;
+    }
+    void operator++ () {
+        it++;
+    }
+    int operator- (const Iterator other) {
+        return it - other.it;
+    }
+    int operator+ (const Iterator other) {
+        return it + other.it;
+    }
+    void operator= (const Iterator other) {
+        it = other.it;
+    }
+    bool operator== (const Iterator other) {
+        if (other.it == it) {
+            return true;
+        }
+        else { return false; }
+    }
+    bool operator!= (const Iterator other) {
+        if (other.it != it) {
+            return true;
+        }
+        else { return false; }
+    }
+    T operator* (int n) {
+        return *it;
+    }
+};
 
 template <class T>
 class Vect {
 public:
     int capacity = FIXED_CAP;
-    T* array = new T [capacity];
+    T* array = nullptr;
     int size_v;
     Vect() {
         size_v = 0;
+        array = new T[capacity];
     }
     Vect(int n, T val) {
         size_v = n;
         capacity = n;
+        array = new T[capacity];
         for (int i = 0; i < size_v; i++) {
             array[i] = val;
         }
     }
+    Vect(const Vect& other) {
+        size_v = other.size_v;
+        capacity = other.capacity;
+        array = new T[capacity];
+        for (int i = 0; i < size_v; i++) {
+            array[i] = other.array[i];
+        }
+    }
     ~Vect() {
         delete[] array;
+        array = nullptr;
     }
 
-    // Vect(const Vect &other) {}
+    void operator= (const Vect& other) {
+        size_v = other.size_v;
+        delete[] array;
+        capacity = other.capacity;
+        T* array = new T[capacity];
+        for (int i = 0; i < size_v; i++) {
+            array[i] = other.array[i];
+        }
+    }
 
-    int operator[] (int i) {
+    T operator[] (int i) {
         if (i >= size_v) {
             std::cerr << "Index out of range" << std::endl;
             return 0;
@@ -34,24 +111,26 @@ public:
             return array[i];
         }
     }
-
-    // int* begin() {}
-    // int* end() {}
-
+    Iterator<T> begin() {
+        return Iterator<T>(array);
+    }
+    Iterator<T> end() {
+        return Iterator<T>(array + size_v);
+    }
     int size() {
         return size_v;
     }
     T back() {
-        return array[size_v-1]
+        return array[size_v - 1];
     }
     void push_back(const int x) {
         if (size_v == capacity) {
-            T* new_array = new T[capacity*2];
+            T* new_array = new T[capacity * 2];
             for (int i = 0; i < size_v; i++) {
                 new_array[i] = array[i];
             }
             new_array[size_v] = x;
-            delete [] array;
+            delete[] array;
             array = new_array;
             size_v++;
             capacity *= 2;
@@ -65,15 +144,14 @@ public:
         if (size_v - 1 == capacity / 2) {
             capacity /= 2;
             T* new_array = new T[capacity];
-            for (int i = 0; i < size_v-1; i++) {
+            for (int i = 0; i < size_v - 1; i++) {
                 new_array[i] = array[i];
             }
-            delete [] array;
+            delete[] array;
             array = new_array;
             size_v--;
         }
         else {
-            delete &array[size_v-1];
             size_v--;
         }
     }
@@ -81,7 +159,7 @@ public:
         std::cout << "[";
         for (int i = 0; i < size_v; i++) {
             std::cout << array[i];
-            if (i != size_v-1) {
+            if (i != size_v - 1) {
                 std::cout << "; ";
             }
         }
@@ -91,31 +169,17 @@ public:
 };
 
 int main() {
-    // Initializing different vectors
     Vect<int> a;
-    for (int i = 0; i < 10; i++) {
-        a.push_back(i);
-    }
+    a.push_back(2);
+    a.push_back(5);
+    a.push_back(2);
+    a.push_back(8);
+    a.push_back(4);
+    a.push_back(9);
+    a.push_back(3);
     a.print();
-
-    Vect<int> b(10, 0);
-    b.print();
-
-    // Checking capacity
-    /* std::cout << "Current capacity of b when size_v is 10 : " << b.capacity << std::endl;
-    b.push_back(10);
-    b.print();
-    std::cout << "Current capacity of b when size_v is 11 : " << b.capacity << std::endl;
-    b.pop_back();
-    std::cout << "Current capacity of b when size_v is 10 : " << b.capacity << std::endl; */
-
-    std::cout << "Checking operator[]" << std::endl;
-    for (int i = 0; i < a.size_v; i++) {
-        std::cout << a.array[i] << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "Deleting vector b" << std::endl;
-    b.~Vect();
+    Vect<int> b(a);
+    b.print(); 
+    _CrtDumpMemoryLeaks();
     return 0;
 }
