@@ -2,10 +2,6 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#define __CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
 
 const int FIXED_CAP = 8;
 
@@ -35,11 +31,8 @@ public:
     void operator++ () {
         it++;
     }
-    int operator- (const Iterator other) {
+    std::ptrdiff_t operator- (const Iterator other) {
         return it - other.it;
-    }
-    int operator+ (const Iterator other) {
-        return it + other.it;
     }
     void operator= (const Iterator other) {
         it = other.it;
@@ -79,7 +72,7 @@ public:
             array[i] = val;
         }
     }
-    Vect(const Vect& other) {
+    Vect(const Vect<T>& other) {
         size_v = other.size_v;
         capacity = other.capacity;
         array = new T[capacity];
@@ -179,7 +172,7 @@ int main() {
     a.push_back(3);
     a.print();
     Vect<int> b(a);
-    b.print(); 
-    _CrtDumpMemoryLeaks();
+    //std::sort(a.begin(), a.end());
+    b.print();
     return 0;
 }
