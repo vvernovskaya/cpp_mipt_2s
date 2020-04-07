@@ -10,6 +10,11 @@ class Iterator {
 private:
     T* it;
 public:
+    using value_type = T;
+    using difference_type = std::ptrdiff_t;
+    using pointer = T*;
+    using reference = T&;
+    using iterator_category = std::random_access_iterator_tag;
     Iterator(T* arr) {
         it = arr;
     }
@@ -19,23 +24,33 @@ public:
     void operator-= (int n) {
         it -= n;
     }
-    Iterator operator+ (int n) const {
-        return it + n;
+    Iterator& operator+ (int n) const {
+        it += n;
+        return *this;
     }
-    Iterator operator- (int n) const {
-        return it - n;
+    Iterator& operator- (int n) const {
+        it -= n;
+        return *this;
     }
-    void operator-- () {
+    Iterator& operator-- () {
         it--;
+        return *this;
     }
-    void operator++ () {
+    Iterator& operator++ () {
         it++;
+        return *this;
     }
-    std::ptrdiff_t operator- (const Iterator other) {
+    difference_type operator- (const Iterator other) { 
         return it - other.it;
     }
     void operator= (const Iterator other) {
         it = other.it;
+    }
+    bool operator< (const Iterator other) {
+        if (other.it > it) {
+            return true;
+        }
+        else { return false; }
     }
     bool operator== (const Iterator other) {
         if (other.it == it) {
@@ -49,8 +64,8 @@ public:
         }
         else { return false; }
     }
-    T operator* (int n) {
-        return *it;
+    T* operator* () {
+        return it;
     }
 };
 
@@ -95,7 +110,7 @@ public:
         }
     }
 
-    T operator[] (int i) {
+    T& operator[] (int i) {
         if (i >= size_v) {
             std::cerr << "Index out of range" << std::endl;
             return 0;
@@ -113,7 +128,7 @@ public:
     int size() {
         return size_v;
     }
-    T back() {
+    T& back() {
         return array[size_v - 1];
     }
     void push_back(const int x) {
@@ -172,7 +187,7 @@ int main() {
     a.push_back(3);
     a.print();
     Vect<int> b(a);
-    //std::sort(a.begin(), a.end());
+    std::sort(a.begin(), a.end());
     b.print();
     return 0;
 }
