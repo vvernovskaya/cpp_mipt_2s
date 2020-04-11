@@ -18,19 +18,22 @@ public:
     Iterator(T* arr) {
         it = arr;
     }
+    Iterator(const Iterator& other) {
+        it = other.it;
+    }
     void operator+= (int n) {
         it += n;
     }
     void operator-= (int n) {
         it -= n;
     }
-    Iterator& operator+ (int n) const {
+    Iterator& operator+ (int n) {
         it += n;
         return *this;
     }
-    Iterator& operator- (int n) const {
+    Iterator operator- (int n) {
         it -= n;
-        return *this;
+        return Iterator<value_type>(it);
     }
     Iterator& operator-- () {
         it--;
@@ -40,11 +43,8 @@ public:
         it++;
         return *this;
     }
-    difference_type operator- (const Iterator other) { 
-        return it - other.it;
-    }
-    void operator= (const Iterator other) {
-        it = other.it;
+    friend difference_type operator- (const Iterator& left, const Iterator& right) { 
+        return left.it - right.it;
     }
     bool operator< (const Iterator other) {
         if (other.it > it) {
@@ -64,8 +64,8 @@ public:
         }
         else { return false; }
     }
-    T* operator* () {
-        return it;
+    T& operator* () {
+        return *it;
     }
 };
 
@@ -188,6 +188,6 @@ int main() {
     a.print();
     Vect<int> b(a);
     std::sort(a.begin(), a.end());
-    b.print();
+    a.print();
     return 0;
 }
